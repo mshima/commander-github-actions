@@ -1,0 +1,36 @@
+# commander-github-actions
+
+[![License][]](LICENSE)
+[![Build Status]](https://github.com/mshima/commander-github-actions/actions/workflows/ci.yml)
+[![NPM Package]](https://npmjs.org/package/commander-github-actions)
+[![Code Coverage]](https://codecov.io/gh/mshima/commander-github-actions)
+[![semantic-release]](https://github.com/semantic-release/semantic-release)
+
+[license]: https://img.shields.io/badge/UNLICENSED-blue.svg
+[build status]: https://github.com/mshima/commander-github-actions/actions/workflows/ci.yml/badge.svg
+[npm package]: https://img.shields.io/npm/v/commander-github-actions.svg
+[code coverage]: https://codecov.io/gh/mshima/commander-github-actions/branch/master/graph/badge.svg
+[semantic-release]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
+
+> Parse and generate GitHub Actions with commander
+
+## Install
+
+```shell
+npm install commander-github-actions
+```
+
+## Use
+
+```typescript
+import { createCommand, createOption, Command, Option } from "commander-github-actions";
+// TODO: describe usage
+```
+
+## Related
+
+TODO
+
+## Acknowledgments
+
+TODO

@@ -1,0 +1,73 @@
+{
+  "name": "commander-github-actions",
+  "version": "0.0.0",
+  "description": "Build GitHub Action inputs using commander",
+  "keywords": [
+    "commander",
+    "github-actions"
+  ],
+  "homepage": "https://github.com/mshima/commander-github-actions",
+  "bugs": {
+    "url": "https://github.com/mshima/commander-github-actions/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mshima/commander-github-actions.git"
+  },
+  "license": "MIT",
+  "author": "Marcelo Shima <marceloshima@gmail.com> (https://github.com/mshima)",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./dev": "./dist/dev.js"
+  },
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf --no-glob dist",
+    "docs": "docs-ts",
+    "format": "prettier --list-different .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint --ext ts . package.json",
+    "lint-staged": "lint-staged",
+    "lint:fix": "eslint --ext ts --fix . package.json",
+    "test": ""
+  },
+  "pre-commit": "lint-staged",
+  "dependencies": {
+    "commander": "^9.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "codecov": "^3.8.1",
+    "docs-ts": "^0.5.3",
+    "eslint": "^7.16.0",
+    "eslint-config-prettier": "^6.6.0",
+    "eslint-plugin-fp-ts": "^0.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-json-format": "^2.0.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-security": "^1.4.0",
+    "fast-check": "^2.10.0",
+    "lint-staged": "^10.5.3",
+    "pre-commit": "^1.2.2",
+    "prettier": "2.7.1",
+    "prettier-plugin-packagejson": "^2.2.18",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4"
+  },
+  "peerDependencies": {
+    "yaml": "^2.1.1"
+  },
+  "peerDependenciesMeta": {
+    "yaml": {
+      "optional": true
+    }
+  }
+}
