@@ -41,6 +41,7 @@
     "commander": "9.4.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.184",
     "@types/node": "^16",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
@@ -63,9 +64,13 @@
     "typescript": "^4.4.4"
   },
   "peerDependencies": {
+    "lodash": "^4.17.21",
     "yaml": "^2.1.1"
   },
   "peerDependenciesMeta": {
+    "lodash": {
+      "optional": true
+    },
     "yaml": {
       "optional": true
     }
