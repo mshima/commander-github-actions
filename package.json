@@ -38,7 +38,7 @@
   },
   "pre-commit": "lint-staged",
   "dependencies": {
-    "commander": "^9.4.0"
+    "commander": "9.4.0"
   },
   "devDependencies": {
     "@types/node": "^16",
