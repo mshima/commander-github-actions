@@ -52,11 +52,15 @@ export class Command extends CommanderCommand {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     (this as any).options.forEach((option: Option) => {
       const envVar = (option as any).envVar;
-      const thisAny = this as any;
       if (envVar && envVar in process.env) {
+        const value = process.env[envVar];
+        if (value === "") {
+          return;
+        }
         const optionKey: string = option.attributeName();
         if (this.getOptionValue(optionKey) === undefined || ["default", "config", "env"].includes(this.getOptionValueSource(optionKey))) {
-          thisAny.emit(`optionEnv:${option.name()}`, process.env[envVar]);
+          const thisAny = this as any;
+          thisAny.emit(`optionEnv:${option.name()}`, value);
         }
       }
     });
