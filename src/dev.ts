@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 import { readFile } from "fs/promises";
 
 import { Command, Option } from "commander";
 import { stringify } from "yaml";
+import lodash from "lodash";
 
 const toGitHubActionMetadata = (options: Option[]) =>
   Object.fromEntries(
@@ -10,8 +11,8 @@ const toGitHubActionMetadata = (options: Option[]) =>
       option.name(),
       {
         description: option.description,
-        required: option.required,
-        default: option.defaultValue,
+        required: option.mandatory,
+        default: typeof option.defaultValue === "boolean" ? `${option.defaultValue}` : option.defaultValue,
       },
     ])
   );
@@ -23,16 +24,18 @@ export async function generateActionsYml(command: Command, additionalStructure: 
   } catch (error) {
     console.log("package.json not found in current path");
   }
-  const ymlStructure = {
-    name: (json.name as string) || "name",
-    author: json.author as string,
-    description: (json.description as string) || "description",
-    runs: {
-      using: "node16",
-      main: "main.js",
+  const ymlStructure = lodash.merge(
+    {
+      name: (json.name as string) || "name",
+      author: json.author as string,
+      description: (json.description as string) || "description",
+      runs: {
+        using: "node16",
+        main: "main.js",
+      },
+      inputs: toGitHubActionMetadata(command.createHelp().visibleOptions(command)),
     },
-    inputs: toGitHubActionMetadata(command.createHelp().visibleOptions(command)),
-    ...additionalStructure,
-  };
+    additionalStructure
+  );
   return stringify(ymlStructure);
 }

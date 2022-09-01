@@ -20,11 +20,16 @@
 npm install commander-github-actions
 ```
 
+`commander-github-actions/dev` is used to generate actions.yml. Given the development nature, dependencies are optional:
+
+```shell
+npm install yaml lodash --save-dev
+```
+
 ## Use
 
 ```typescript
 import { createCommand, createOption, Command, Option } from "commander-github-actions";
-// TODO: describe usage
 ```
 
 ## Related
