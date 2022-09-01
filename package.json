@@ -1,6 +1,6 @@
 {
   "name": "commander-github-actions",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Build GitHub Action inputs using commander",
   "keywords": [
     "commander",
@@ -41,6 +41,7 @@
     "commander": "9.4.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.184",
     "@types/node": "^16",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
@@ -60,18 +61,17 @@
     "prettier-plugin-packagejson": "^2.2.18",
     "rimraf": "^3.0.2",
     "ts-node": "^10.3.0",
-    "typescript": "^4.4.4",
-    "@types/lodash": "^4.14.184"
+    "typescript": "^4.4.4"
   },
   "peerDependencies": {
-    "yaml": "^2.1.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "yaml": "^2.1.1"
   },
   "peerDependenciesMeta": {
-    "yaml": {
+    "lodash": {
       "optional": true
     },
-    "lodash": {
+    "yaml": {
       "optional": true
     }
   }
