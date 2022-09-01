@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 import { readFile } from "fs/promises";
-import { stringify } from "yaml";
-import lodash from "lodash";
 const toGitHubActionMetadata = (options) => Object.fromEntries(options.map((option) => [
     option.name(),
     {
@@ -10,15 +7,28 @@ const toGitHubActionMetadata = (options) => Object.fromEntries(options.map((opti
         default: typeof option.defaultValue === "boolean" ? `${option.defaultValue}` : option.defaultValue,
     },
 ]));
-export async function generateActionsYml(command, additionalStructure = {}, customizer = (data) => data) {
+export async function generateActionsYml(command, customizer = (data) => data) {
     let json = {};
     try {
         json = JSON.parse((await readFile("./package.json")).toString());
     }
     catch (error) {
-        console.log("package.json not found in current path");
+        let packageJsonFile;
+        try {
+            const { pkgUp } = await import("pkg-up");
+            packageJsonFile = await pkgUp();
+        }
+        catch (error) {
+            console.log("to find the nearest package.json run 'npm install pkg-up --save-dev'");
+        }
+        if (packageJsonFile) {
+            json = JSON.parse((await readFile(packageJsonFile)).toString());
+        }
+        else {
+            console.log("package.json not found in current path");
+        }
     }
-    const ymlStructure = lodash.merge({
+    const ymlStructure = customizer({
         name: json.name || "name",
         author: json.author,
         description: json.description || "description",
@@ -27,7 +37,13 @@ export async function generateActionsYml(command, additionalStructure = {}, cust
             main: "main.js",
         },
         inputs: toGitHubActionMetadata(command.createHelp().visibleOptions(command)),
-    }, additionalStructure);
-    return stringify(customizer(ymlStructure));
+    });
+    try {
+        const { stringify } = await import("yaml");
+        return stringify(ymlStructure);
+    }
+    catch (error) {
+        throw new Error("This module requires 'yaml' module run 'npm install yaml --save-dev'");
+    }
 }
 //# sourceMappingURL=dev.js.map

@@ -29,6 +29,7 @@ npm install yaml lodash --save-dev
 ## Use
 
 program.js:
+
 ```js
 export function buildCommand(command = new Command()) {
   return command.option(...).addOption(command.createOption(...));
@@ -36,20 +37,23 @@ export function buildCommand(command = new Command()) {
 ```
 
 cli.js (executable):
+
 ```js
-import { buildCommand } from './program.js';
+import { buildCommand } from "./program.js";
 const options = buildCommand().parse();
 ```
 
 action.js (GitHub action entrypoint):
+
 ```js
-import { Command } from 'commander-github-actions';
-import { buildCommand } from './program.js';
+import { Command } from "commander-github-actions";
+import { buildCommand } from "./program.js";
 
 const options = buildCommand(new Command()).parse();
 ```
 
 drop in replacements for commander are provided:
+
 ```js
 import { createCommand, createOption, Command, Option, program } from "commander-github-actions";
 ```
@@ -57,6 +61,7 @@ import { createCommand, createOption, Command, Option, program } from "commander
 ## Generate action.yml
 
 dev/generate-action-yml.yml
+
 ```
 #!/usr/bin/env node
 import { writeFile } from 'fs/promises';

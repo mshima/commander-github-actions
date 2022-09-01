@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 import { readFile } from "fs/promises";
 
 import { Command, Option } from "commander";
-import { stringify } from "yaml";
-import lodash from "lodash";
 
 const toGitHubActionMetadata = (options: Option[]) =>
   Object.fromEntries(
@@ -17,29 +14,38 @@ const toGitHubActionMetadata = (options: Option[]) =>
     ])
   );
 
-export async function generateActionsYml(
-  command: Command,
-  additionalStructure: object = {},
-  customizer = (data: any) => data
-): Promise<string> {
+export async function generateActionsYml(command: Command, customizer = (data: any): any => data): Promise<string> {
   let json: any = {};
   try {
     json = JSON.parse((await readFile("./package.json")).toString());
   } catch (error) {
-    console.log("package.json not found in current path");
+    let packageJsonFile;
+    try {
+      const { pkgUp } = await import("pkg-up");
+      packageJsonFile = await pkgUp();
+    } catch (error) {
+      console.log("to find the nearest package.json run 'npm install pkg-up --save-dev'");
+    }
+    if (packageJsonFile) {
+      json = JSON.parse((await readFile(packageJsonFile)).toString());
+    } else {
+      console.log("package.json not found in current path");
+    }
   }
-  const ymlStructure = lodash.merge(
-    {
-      name: (json.name as string) || "name",
-      author: json.author as string,
-      description: (json.description as string) || "description",
-      runs: {
-        using: "node16",
-        main: "main.js",
-      },
-      inputs: toGitHubActionMetadata(command.createHelp().visibleOptions(command)),
+  const ymlStructure = customizer({
+    name: (json.name as string) || "name",
+    author: json.author as string,
+    description: (json.description as string) || "description",
+    runs: {
+      using: "node16",
+      main: "main.js",
     },
-    additionalStructure
-  );
-  return stringify(customizer(ymlStructure));
+    inputs: toGitHubActionMetadata(command.createHelp().visibleOptions(command)),
+  });
+  try {
+    const { stringify } = await import("yaml");
+    return stringify(ymlStructure);
+  } catch (error) {
+    throw new Error("This module requires 'yaml' module run 'npm install yaml --save-dev'");
+  }
 }

@@ -64,11 +64,11 @@
     "typescript": "^4.4.4"
   },
   "peerDependencies": {
-    "lodash": "^4.17.21",
+    "pkg-up": "^4.0.0",
     "yaml": "^2.1.1"
   },
   "peerDependenciesMeta": {
-    "lodash": {
+    "pkg-up": {
       "optional": true
     },
     "yaml": {

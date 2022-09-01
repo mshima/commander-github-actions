@@ -1,69 +1,74 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-import { Command as CommanderCommand, Option as CommanderOption } from "commander";
+import { Command as CommanderCommand } from "commander";
+import type { Option } from "commander";
 
 const TRUE_VALUES = ["true", "True", "TRUE"];
 const FALSE_VALUES = ["false", "False", "FALSE"];
 const BOOLEAN_VALUES = [...TRUE_VALUES, ...FALSE_VALUES];
 
-export function createOption(flags: string, description?: string | undefined): Option {
-  return new Option(flags, description);
+declare module "commander" {
+  export interface Command {
+    _parseOptionsEnv(): void;
+    options: Option[];
+    emit(eventName: string | symbol, ...args: any[]): boolean;
+  }
 }
+
+const getGithubEnvVarName = (option: Option): string => `INPUT_${option.name().toUpperCase()}`;
+
+const convertEnvValueToOptionValue = (option: Option, rawValue: string): any => {
+  if (option.variadic) {
+    return rawValue.split("\n").filter((val) => val !== "");
+  }
+  if (!option.isBoolean()) {
+    return rawValue;
+  }
+  if (BOOLEAN_VALUES.includes(rawValue)) {
+    return TRUE_VALUES.includes(rawValue);
+  }
+  throw new Error(`${rawValue} is not a valid value yml boolean`);
+};
 
 export function createCommand(name: string): Command {
   return new Command(name);
 }
 
-class Option extends CommanderOption {
-  constructor(flags: string, description?: string) {
-    super(flags, description);
-
-    (this as any).envVar = `INPUT_${this.name().toUpperCase()}`;
-
-    this.argParser((value) => {
-      if (value == null) {
-        return value;
-      }
-      value = value.trim();
-      if (this.variadic) {
-        return value.split("\n").filter((val) => val !== "");
-      }
-      if (!this.isBoolean()) {
-        return value;
-      }
-      if (!BOOLEAN_VALUES.includes(value)) {
-        throw new Error(`${value} is not a valid value yml boolean`);
-      }
-      return TRUE_VALUES.includes(value);
-    });
-  }
-
-  // NOOP, we use github env variables.
-  override env(): this {
-    return this;
-  }
+/* export if parseConfig event is accepted upstream */
+function prepareCommand(command: Command): Command {
+  return command
+    .helpOption(false)
+    .exitOverride()
+    .on(
+      "parseConfig",
+      function (this: Command) {
+        this.options.forEach((option: Option) => {
+          const githubEnvVarName = getGithubEnvVarName(option);
+          if (githubEnvVarName && githubEnvVarName in process.env) {
+            const value = process.env[githubEnvVarName]?.trim();
+            if (!value) {
+              return;
+            }
+            const optionKey: string = option.attributeName();
+            if (
+              this.getOptionValue(optionKey) === undefined ||
+              ["default", "config", "env"].includes(this.getOptionValueSource(optionKey))
+            ) {
+              this.setOptionValueWithSource(option.attributeName(), convertEnvValueToOptionValue(option, value), "env");
+            }
+          }
+        });
+      }.bind(command)
+    );
 }
 
 export class Command extends CommanderCommand {
-  override createOption(flags: string, description?: string | undefined): Option {
-    return createOption(flags, description);
+  constructor(name?: string) {
+    super(name);
+    prepareCommand(this);
   }
 
-  _parseOptionsEnv() {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    (this as any).options.forEach((option: Option) => {
-      const envVar = (option as any).envVar;
-      if (envVar && envVar in process.env) {
-        const value = process.env[envVar];
-        if (value === "") {
-          return;
-        }
-        const optionKey: string = option.attributeName();
-        if (this.getOptionValue(optionKey) === undefined || ["default", "config", "env"].includes(this.getOptionValueSource(optionKey))) {
-          const thisAny = this as any;
-          thisAny.emit(`optionEnv:${option.name()}`, value);
-        }
-      }
-    });
+  override _parseOptionsEnv() {
+    super._parseOptionsEnv();
+    this.emit("parseConfig");
   }
 }
 
