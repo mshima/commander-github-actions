@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 import { readFile } from "fs/promises";
 import { stringify } from "yaml";
 import lodash from "lodash";
@@ -10,7 +10,7 @@ const toGitHubActionMetadata = (options) => Object.fromEntries(options.map((opti
         default: typeof option.defaultValue === "boolean" ? `${option.defaultValue}` : option.defaultValue,
     },
 ]));
-export async function generateActionsYml(command, additionalStructure = {}) {
+export async function generateActionsYml(command, additionalStructure = {}, customizer = (data) => data) {
     let json = {};
     try {
         json = JSON.parse((await readFile("./package.json")).toString());
@@ -28,6 +28,6 @@ export async function generateActionsYml(command, additionalStructure = {}) {
         },
         inputs: toGitHubActionMetadata(command.createHelp().visibleOptions(command)),
     }, additionalStructure);
-    return stringify(ymlStructure);
+    return stringify(customizer(ymlStructure));
 }
 //# sourceMappingURL=dev.js.map
