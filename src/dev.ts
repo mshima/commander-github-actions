@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 import { readFile } from "fs/promises";
 
 import { Command, Option } from "commander";
@@ -17,7 +17,11 @@ const toGitHubActionMetadata = (options: Option[]) =>
     ])
   );
 
-export async function generateActionsYml(command: Command, additionalStructure: object = {}): Promise<string> {
+export async function generateActionsYml(
+  command: Command,
+  additionalStructure: object = {},
+  customizer = (data: any) => data
+): Promise<string> {
   let json: any = {};
   try {
     json = JSON.parse((await readFile("./package.json")).toString());
@@ -37,5 +41,5 @@ export async function generateActionsYml(command: Command, additionalStructure: 
     },
     additionalStructure
   );
-  return stringify(ymlStructure);
+  return stringify(customizer(ymlStructure));
 }

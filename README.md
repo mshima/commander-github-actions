@@ -28,14 +28,45 @@ npm install yaml lodash --save-dev
 
 ## Use
 
-```typescript
-import { createCommand, createOption, Command, Option } from "commander-github-actions";
+program.js:
+```js
+export function buildCommand(command = new Command()) {
+  return command.option(...).addOption(command.createOption(...));
+}
+```
+
+cli.js (executable):
+```js
+import { buildCommand } from './program.js';
+const options = buildCommand().parse();
+```
+
+action.js (GitHub action entrypoint):
+```js
+import { Command } from 'commander-github-actions';
+import { buildCommand } from './program.js';
+
+const options = buildCommand(new Command()).parse();
+```
+
+drop in replacements for commander are provided:
+```js
+import { createCommand, createOption, Command, Option, program } from "commander-github-actions";
+```
+
+## Generate action.yml
+
+dev/generate-action-yml.yml
+```
+#!/usr/bin/env node
+import { writeFile } from 'fs/promises';
+
+import { generateActionsYml } from 'commander-github-actions/dev';
+import program from '../action/program.js';
+
+await writeFile('action.yml', (await generateActionsYml(program, { runs: { main: 'action/main.js' } })));
 ```
 
 ## Related
 
-TODO
-
-## Acknowledgments
-
-TODO
+https://github.com/tj/commander.js/issues/1787
