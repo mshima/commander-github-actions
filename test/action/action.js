@@ -12,6 +12,9 @@ try {
   if (!options.foo) {
     throw new Error("Foo is not set");
   }
+  if (options.undefined !== undefined) {
+    throw new Error("undefined value is unexpected");
+  }
 } catch (error) {
   setFailed(error.message);
   process.exit(1);
